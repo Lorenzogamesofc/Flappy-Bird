@@ -41,7 +41,7 @@ class Passaro:
         self.altura = self.y
 
     def mover(self):
-        # calcular deslocamento
+        # calcular o deslocamento
         self.tempo += 1
         deslocamento = 1.5 * (self.tempo**2) + self.velocidade * self.tempo
 
@@ -124,8 +124,8 @@ class Cano:
         topo_mask = pygame.mask.from_surface(self.CANO_TOPO)
         base_mask = pygame.mask.from_surface(self.CANO_BASE)
 
-        distancia_topo = (self.x - Passaro.x, self.pos_topo - round(Passaro.y))
-        distancia_base = (self.x - Passaro.x, self.pos_base - round(Passaro.y))
+        distancia_topo = (self.x - passaro.x, self.pos_topo - round(passaro.y))
+        distancia_base = (self.x - passaro.x, self.pos_base - round(passaro.y))
 
         topo_ponto = passaro_mask.overlap(topo_mask, distancia_topo)
         base_ponto = passaro_mask.overlap(base_mask, distancia_base)
@@ -151,9 +151,9 @@ class Chao:
         self.x2 -= self.VELOCIDADE
 
         if self.x1 + self.LARGURA < 0:
-            self.x1 = self.x1 + self.LARGURA
+            self.x1 = self.x2 + self.LARGURA
         if self.x2 + self.LARGURA < 0:
-            self.x2 = self.x2 + self.LARGURA
+            self.x2 = self.x1 + self.LARGURA
 
     def desenhar(self, tela):
         tela.blit(self.IMAGEM, (self.x1, self.y))
@@ -163,19 +163,19 @@ class Chao:
 def desenhar_tela(tela, passaros, canos, chao, pontos):
     tela.blit(IMAGEM_BACKGROUND, (0, 0))
     for passaro in passaros:
-        Passaro.desenhar(tela)
+        passaro.desenhar(tela)
     for cano in canos:
-        Cano.desenhar(tela)
+        cano.desenhar(tela)
     
     texto = FONTE_PONTOS.render(f"Pontuação: {pontos}", 1, (255, 255, 255))
     tela.blit(texto, (TELA_LARGURA - 10 - texto.get_width(), 10))
-    Chao.desenhar(tela)
+    chao.desenhar(tela)
     pygame.display.update()
 
 
 def main():
     passaros = [Passaro(230, 350)]
-    chao = [Chao(730)]
+    chao = Chao(730)
     canos = [Cano(700)]
     tela = pygame.display.set_mode((TELA_LARGURA, TELA_ALTURA))
     pontos = 0
@@ -199,14 +199,17 @@ def main():
         # mover as coisas
         for passaro in passaros:
             passaro.mover()
-        Chao.mover()
+        chao.mover()
 
         adicionar_cano = False
         remover_canos = []
         for cano in canos:
             for i, passaro in enumerate(passaros):
                 if cano.colidir(passaro):
-                    passaros.pop(i)
+                    passaros.pop(i)                    
+                    print("Ops você perdeu!") 
+                    pygame.QUIT()
+                    quit()                    
                 if not cano.passou and passaro.x > cano.x:
                     cano.passou = True
                     adicionar_cano = True
