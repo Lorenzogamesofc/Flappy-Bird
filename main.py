@@ -206,10 +206,7 @@ def main():
         for cano in canos:
             for i, passaro in enumerate(passaros):
                 if cano.colidir(passaro):
-                    passaros.pop(i)                    
-                    print("Ops você perdeu!") 
-                    pygame.QUIT()
-                    quit()                    
+                    passaros.pop(i)                                      
                 if not cano.passou and passaro.x > cano.x:
                     cano.passou = True
                     adicionar_cano = True
